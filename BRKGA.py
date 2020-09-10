@@ -1,10 +1,18 @@
+# Imports
+import time
+import numpy as np
+import pandas as pd
+import math
+import random 
+import matplotlib.pyplot as plt
+
 # Parâmetros de Entrada
-p = 10                  # Tamanho da População 
+p = 100                  # Tamanho da População 
 n = len(cidades)        # Quantidade de genes em cada cromossomo/número de cidades
 pe = 0.3                # Porcentagem de indivíduos Elite
 pm = 0.2                # Porcentagem de indivíduos gerados na mutação
 taxaHerancaElite = 0.7  # Taxa de um descendente herdar o alelo do pai Elite
-N_geracoes = 10         # Número máximo de gerações
+N_geracoes = 100         # Número máximo de gerações
 
 # Gerar a População Inicial de forma aleatória
 def gerarPopulacao():
@@ -139,22 +147,24 @@ def novaGeracao(popElite, popNElite, popMutantes):
 
 # Algoritmo BRKGA
 def BRKGA():
+    melhorFitness = []
     populacaoInicial = gerarPopulacao()
     rotas,ordemPopulacao = decoder(populacaoInicial)
     list_fitness = fitness(rotas)
     
     for i in range(1, N_geracoes):
-        print('Geração: ', i)
+        #print('Geração: ', i)
         popElite, popNElite = classificarPopulacao(ordemPopulacao, list_fitness)        
         popMutantes = popMutante(pm)
         novaPopulacao = novaGeracao(popElite, popNElite, popMutantes)
         rotas, ordemPopulacao = decoder(novaPopulacao)
         list_fitness = fitness(rotas)
         L = np.argmin(list_fitness)
-        melhorFitness = list_fitness[L]
+        melhorFitness.append(list_fitness[L])
         melhorRota = rotas[L]
 
-        print(melhorFitness)
-        print(melhorRota)
+    print(melhorFitness)
+    print(melhorRota)
 
 BRKGA()
+
