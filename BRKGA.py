@@ -6,6 +6,38 @@ import math
 import random 
 import matplotlib.pyplot as plt
 
+i25 = pd.read_csv(os.path.join(dir_remoto,'Projeto - Algortimos/data/Instancia_25.csv'),  sep = ";" )
+i35 = pd.read_csv(os.path.join(dir_remoto,'Projeto - Algortimos/data/Instancia_35.csv'),  sep = ";" )
+i50 = pd.read_csv(os.path.join(dir_remoto,'Projeto - Algortimos/data/Instancia_50.csv'),  sep = ";" )
+i100 = pd.read_csv(os.path.join(dir_remoto,'Projeto - Algortimos/data/Instancia_100.csv'),  sep = ";" )
+
+i25 = i25.to_numpy()
+i35 = i35.to_numpy()
+i50 = i50.to_numpy()
+i100 = i100.to_numpy()
+
+print(i25.shape)
+print(i35.shape)
+print(i50.shape)
+print(i100.shape)
+
+# Transformando em os dados em dicionário
+
+def dicionario(dados):
+  dicio = {}
+  for i in range(len(dados)):
+    dicio[dados[i][0]] = (dados[i][1], dados[i][2])
+  return dicio
+
+# Escolha qual instância vocÊ quer rodar
+cidades = dicionario(i25)
+#cidades = dicionario(i35)
+#cidades = dicionario(i50)
+#cidades = dicionario(i100)
+print(cidades)
+
+inicioExc = time.time()
+
 # Parâmetros de Entrada
 p = 100                  # Tamanho da População 
 n = len(cidades)        # Quantidade de genes em cada cromossomo/número de cidades
@@ -151,7 +183,9 @@ def BRKGA():
     populacaoInicial = gerarPopulacao()
     rotas,ordemPopulacao = decoder(populacaoInicial)
     list_fitness = fitness(rotas)
-    
+    L = np.argmin(list_fitness)
+    melhorFitness.append((list_fitness[L]))
+
     for i in range(1, N_geracoes):
         #print('Geração: ', i)
         popElite, popNElite = classificarPopulacao(ordemPopulacao, list_fitness)        
@@ -161,10 +195,24 @@ def BRKGA():
         list_fitness = fitness(rotas)
         L = np.argmin(list_fitness)
         melhorFitness.append(list_fitness[L])
+        melhorFit = list_fitness[L]
         melhorRota = rotas[L]
+    return melhorFitness, melhorFit, melhorRota
+  
+FitLista, MelhorFit, MelhorRota = BRKGA()
+print("Fitness (Função objetivo) =", MelhorFit)
+print("Rota =", MelhorRota)
+print()
+fimExc=time.time()
 
-    print(melhorFitness)
-    print(melhorRota)
+print("Tempo de execução do modelo: %f segundos" %(fimExc-inicioExc))
 
-BRKGA()
+# Gerando um gráfico Fitness X Geração
+geracao = [i for i in range(0,N_geracoes)]
 
+plt.title('Acompanhamento do melhor fitness por geração')
+plt.plot(geracao, FitLista, marker = 'o', color="red")
+plt.xlabel('Gerações')
+plt.ylabel('Fitness')
+plt.show()
+plt.savefig("Instancia.png")
